@@ -1,0 +1,26 @@
+{
+  "name": "@neo-builder/ai",
+  "version": "0.0.0",
+  "description": "BYO-key Provider abstraction and TimesFM-based Forecast-Gated Regeneration logic for AI Builder.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "LICENSE"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@neo-builder/core": "workspace:*",
+    "@neo-builder/recipes": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  }
+}

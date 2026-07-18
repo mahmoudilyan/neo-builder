@@ -1,0 +1,22 @@
+{
+  "name": "@neo-builder/core",
+  "version": "0.0.0",
+  "description": "Headless Document Model, registry, commands and serialization for AI Builder.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "LICENSE"],
+  "publishConfig": { "access": "public" },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  }
+}

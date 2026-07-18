@@ -1,0 +1,45 @@
+{
+  "name": "@neo-builder/editor-tiptap",
+  "version": "0.0.0",
+  "description": "Opt-in TipTap rich-text editor for AI Builder text Elements.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@neo-builder/core": "workspace:*",
+    "@neo-builder/editor-react": "workspace:*",
+    "react": ">=18"
+  },
+  "dependencies": {
+    "@tiptap/pm": "^2.10.3",
+    "@tiptap/react": "^2.10.3",
+    "@tiptap/starter-kit": "^2.10.3"
+  },
+  "devDependencies": {
+    "@neo-builder/core": "workspace:*",
+    "@neo-builder/editor-react": "workspace:*",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean --external react",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  }
+}

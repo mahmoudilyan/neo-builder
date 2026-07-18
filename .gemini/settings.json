@@ -1,0 +1,7 @@
+{
+	"mcpServers": {
+		"marmo-ui": {
+			"httpUrl": "https://mcp.marmoui.com/mcp"
+		}
+	}
+}

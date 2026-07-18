@@ -1,0 +1,25 @@
+{
+  "name": "@neo-builder/mcp",
+  "version": "0.0.0",
+  "description": "MCP Server surface for external AI agents to operate AI Builder.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "LICENSE"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@neo-builder/core": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  }
+}

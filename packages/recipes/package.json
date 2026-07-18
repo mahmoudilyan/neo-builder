@@ -1,0 +1,26 @@
+{
+  "name": "@neo-builder/recipes",
+  "version": "0.0.0",
+  "description": "Art-directed Layout Recipes + Moods: turn an AI Content Brief into a Document (anti-slop).",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "LICENSE"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@neo-builder/core": "workspace:*",
+    "@neo-builder/theme": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  }
+}

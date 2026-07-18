@@ -1,0 +1,29 @@
+{
+  "name": "@neo-builder/compiler-mjml",
+  "version": "0.0.0",
+  "description": "Compiles the AI Builder Document Model to MJML (Email target).",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "LICENSE"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@neo-builder/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@neo-builder/theme": "workspace:*",
+    "@neo-builder/elements": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  }
+}
