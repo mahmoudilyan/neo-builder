@@ -6,7 +6,7 @@ describe("createRpcPeer", () => {
     const sent: string[] = [];
     const peer = createRpcPeer((json) => sent.push(json));
     const promise = peer.call("get_document");
-    const req = JSON.parse(sent[0]);
+    const req = JSON.parse(sent[0]!);
     expect(req.method).toBe("get_document");
     peer.handleMessage(JSON.stringify({ id: req.id, result: { outline: "root: page" } }));
     await expect(promise).resolves.toEqual({ outline: "root: page" });
@@ -16,7 +16,7 @@ describe("createRpcPeer", () => {
     const sent: string[] = [];
     const peer = createRpcPeer((json) => sent.push(json));
     const promise = peer.call("export", { target: "html" });
-    const req = JSON.parse(sent[0]);
+    const req = JSON.parse(sent[0]!);
     peer.handleMessage(JSON.stringify({ id: req.id, error: "no document" }));
     await expect(promise).rejects.toThrow("no document");
   });
@@ -69,7 +69,7 @@ describe("createRpcPeer", () => {
     peer.handleMessage("not json");
     peer.handleMessage(JSON.stringify({ hello: true }));
     peer.handleMessage(JSON.stringify({ id: 999, result: "stray" }));
-    const req = JSON.parse(sent[0]);
+    const req = JSON.parse(sent[0]!);
     peer.handleMessage(JSON.stringify({ id: req.id, result: "ok" }));
     await expect(promise).resolves.toBe("ok");
   });
