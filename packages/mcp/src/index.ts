@@ -1,5 +1,14 @@
 import type { Registry } from "@neo-builder/core";
 
+export {
+  createRpcPeer,
+  BRIDGE_TOOLS,
+  type RpcPeer,
+  type RpcRequest,
+  type RpcResponse,
+  type BridgeTool,
+} from "./protocol.js";
+
 /**
  * The canonical surface for external AI agents (Claude, Cursor, Codex, Gemini)
  * to operate the builder. This package derives the MCP toolset from Core: every
