@@ -133,7 +133,8 @@ export const BRIDGE_TOOLS: BridgeTool[] = [
       properties: {
         steps: {
           type: "array",
-          description: "Command steps, e.g. {command:'insertNode', args:[parentId, {type:'text', props:{...}}]}.",
+          description:
+            "Command steps. Common: {command:'insert', args:[parentId, elementType, propsObject]}, {command:'update', args:[id, propsObject]}, {command:'remove', args:[id]}, {command:'move', args:[id, parentId, index]}. Full list from list_element_types.",
           items: {
             type: "object",
             properties: {
