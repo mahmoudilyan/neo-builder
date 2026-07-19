@@ -1,5 +1,9 @@
 {
 	"mcpServers": {
+		"neo-builder": {
+			"command": "node",
+			"args": ["packages/mcp/dist/server.js"]
+		},
 		"marmo-ui": {
 			"type": "http",
 			"url": "https://mcp.marmoui.com/mcp"
