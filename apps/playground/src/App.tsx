@@ -21,6 +21,7 @@ import { TiptapText } from "@neo-builder/editor-tiptap";
 import { AiPanel } from "./AiPanel.js";
 import { CommandsDemo } from "./CommandsDemo.js";
 import { AgentPanel } from "./AgentPanel.js";
+import { startMcpBridge, type BridgeStatus } from "./mcpBridge.js";
 
 const ROUTES: { kind: BuilderType; label: string }[] = [
   { kind: "page", label: "Page" },
@@ -68,6 +69,11 @@ function BuilderApp({ kind, go }: { kind: BuilderType; go: (k: BuilderType) => v
   }, [kind]);
   const builder = useBuilder({ registry, doc, theme: defaultTheme, builderType: kind }, [kind]);
   const [rail, setRail] = useState<"agent" | "inspect">("agent");
+  const [mcp, setMcp] = useState<BridgeStatus>("disconnected");
+  useEffect(
+    () => startMcpBridge(builder, { mjmlToHtml: kind === "email" ? emailHtml : undefined }, setMcp),
+    [builder, kind],
+  );
 
   return (
     <div className="page">
@@ -87,6 +93,13 @@ function BuilderApp({ kind, go }: { kind: BuilderType; go: (k: BuilderType) => v
           </Tabs>
         </nav>
         <span style={{ flex: 1 }} />
+        <Text
+          variant="body-sm"
+          className="text-ink-light"
+          title={mcp === "connected" ? "An MCP host (Claude Code / Cursor) is driving this tab" : "No MCP host connected"}
+        >
+          <span style={{ color: mcp === "connected" ? "#22c55e" : "#94a3b8" }}>●</span> MCP
+        </Text>
         <Text variant="body-sm" className="text-ink-light">
           press “/” on a block to insert · chat with the agent →
         </Text>
