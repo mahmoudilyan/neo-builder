@@ -12,11 +12,17 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "LICENSE"],
-  "publishConfig": { "access": "public" },
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@neo-builder/core": "workspace:*",
-    "@neo-builder/recipes": "workspace:*"
+    "@neo-builder/recipes": "workspace:*",
+    "@neo-builder/theme": "workspace:^"
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean",

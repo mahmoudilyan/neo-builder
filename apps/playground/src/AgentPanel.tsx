@@ -197,15 +197,17 @@ export function AgentPanel() {
           onActivity(seq),
         );
         if (seq !== runSeq.current) return;
-        builder.setDocument(generated);
+        // Theme first: the model art-directed its own palette/fonts/gradients.
+        builder.setTheme(generated.theme);
+        builder.setDocument(generated.doc);
         patchLast((m) => ({
           ...m,
           streaming: false,
           toolCalls: m.toolCalls.map((c) => ({ ...c, status: "done" as const })),
           text:
-            generated.root.children.length === 0
+            generated.doc.root.children.length === 0
               ? "The model's markup didn't survive validation — try rephrasing."
-              : `Designed the page directly in Element HTML — ${generated.root.children.length} sections on the canvas. Run ✨ Polish to let me critique my own render.`,
+              : `Designed the page directly in Element HTML — ${generated.doc.root.children.length} sections, own palette + type (theme "${generated.theme.id}"). Run ✨ Polish to let me critique my own render.`,
         }));
       } else if (generate) {
         // Concept generation: AI authors briefs; the system art-directs.

@@ -3,6 +3,7 @@ import { Registry, defineElement } from "@neo-builder/core";
 import {
   parseElementHtml,
   parseDialectFragment,
+  parseDialectTheme,
   extractDialect,
   buildDialectVocabulary,
   generatePageHtml,
@@ -115,10 +116,30 @@ describe("generatePageHtml", () => {
     const provider: Provider = {
       name: "fake",
       async generate() {
-        return `<section columns="1" background="gradient:hero"><text as="h1">Hello</text></section>`;
+        return (
+          `<theme primary="#0e7490" bg="#f8fdfe" gradient-hero="linear-gradient(160deg,#e8f6f9,#f8fdfe)" radius="pill" />` +
+          `<section columns="1" background="gradient:hero"><text as="h1">Hello</text></section>`
+        );
       },
     };
-    const doc = await generatePageHtml(provider, { registry: makeRegistry(), theme, prompt: "x" });
+    const base = { id: "default", tokens: { colors: { bg: "#fff", surface: "#eee", text: "#111", muted: "#777", primary: "#00f", primaryText: "#fff", border: "#ddd" }, fonts: { body: "Arial", heading: "Georgia" }, gradients: { hero: "", accent: "", subtle: "" }, radii: { sm: 4, md: 8, lg: 16, xl: 24, pill: 999 }, spacing: [0], fontSizes: {}, fontWeights: {}, lineHeights: {}, letterSpacing: {}, shadows: {} } };
+    const { doc, theme: generated } = await generatePageHtml(provider, { registry: makeRegistry(), theme: base, prompt: "x" });
     expect(doc.root.children[0].children[0].props.content).toBe("Hello");
+    const tokens = generated.tokens as { colors: { primary: string; text: string }; gradients: { hero: string }; radii: { md: number } };
+    expect(generated.id).toBe("generated");
+    expect(tokens.colors.primary).toBe("#0e7490"); // model-authored
+    expect(tokens.colors.text).toBe("#111"); // unset key keeps base
+    expect(tokens.gradients.hero).toContain("160deg");
+    expect(tokens.radii.md).toBe(20); // "pill" preset
+  });
+
+  it("parseDialectTheme rejects junk values and keeps the base without a theme tag", () => {
+    const base = { id: "default", tokens: { colors: { bg: "#fff", surface: "#eee", text: "#111", muted: "#777", primary: "#00f", primaryText: "#fff", border: "#ddd" }, fonts: { body: "Arial", heading: "Georgia" }, gradients: { hero: "g1", accent: "", subtle: "" }, radii: { sm: 4, md: 8, lg: 16, xl: 24, pill: 999 } } };
+    expect(parseDialectTheme("<section />", base)).toBe(base);
+    const t = parseDialectTheme(`<theme primary="not-a-color" gradient-hero="also junk" radius="wat" />`, base);
+    const tokens = t.tokens as { colors: { primary: string }; gradients: { hero: string }; radii: { md: number } };
+    expect(tokens.colors.primary).toBe("#00f");
+    expect(tokens.gradients.hero).toBe("g1");
+    expect(tokens.radii.md).toBe(8);
   });
 });

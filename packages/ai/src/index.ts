@@ -42,6 +42,7 @@ export { noSlopSkill, createWebSearchTool, SLOP_PHRASES } from "./extensions.js"
 export {
   generatePageHtml,
   parseElementHtml,
+  parseDialectTheme,
   parseDialectFragment,
   extractDialect,
   buildDialectSystemPrompt,

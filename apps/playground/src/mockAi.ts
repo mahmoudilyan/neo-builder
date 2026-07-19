@@ -188,6 +188,7 @@ export const mockHtmlProvider: Provider = {
   async generate(): Promise<string> {
     await new Promise((r) => setTimeout(r, 700));
     return `
+<theme primary="#0e7490" primary-text="#ffffff" bg="#f8fdfe" surface="#e8f6f9" text="#0f2e33" muted="#5e8289" border="#d3e9ee" heading-font="Inter, system-ui, sans-serif" body-font="Inter, system-ui, sans-serif" gradient-hero="linear-gradient(160deg,#e8f6f9 0%,#f8fdfe 70%)" gradient-accent="linear-gradient(135deg,#0e7490 0%,#0891b2 100%)" gradient-subtle="linear-gradient(180deg,#f8fdfe 0%,#eef8fa 100%)" radius="soft" />
 <section columns="1" background="gradient:hero" min-height="460" padding="8">
   <text as="h1" size="3xl" align="center" max-width="18em">Ship your docs site in an afternoon</text>
   <text size="lg" color="muted" align="center" max-width="36em">Markdown in, versioned reference out — search, dark mode and OpenAPI pages included.</text>

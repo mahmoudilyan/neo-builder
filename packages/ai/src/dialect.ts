@@ -1,4 +1,5 @@
 import type { Document, Registry, ThemeLike } from "@neo-builder/core";
+import type { ThemeTokens } from "@neo-builder/theme";
 import type { OnActivity, Provider } from "./provider.js";
 import { parseGeneratedDocument } from "./generate.js";
 
@@ -125,6 +126,56 @@ export function parseElementHtml(text: string, registry: Registry, theme: ThemeL
   return parseGeneratedDocument({ sections }, registry, theme);
 }
 
+const isColorish = (v: unknown) => typeof v === "string" && /^(#|rgb|hsl)/i.test(v);
+const isGradientish = (v: unknown) => typeof v === "string" && /gradient\(/i.test(v);
+
+/** Corner-radius presets the model can name instead of raw numbers. */
+const RADIUS_PRESETS: Record<string, ThemeTokens["radii"]> = {
+  sharp: { sm: 0, md: 0, lg: 0, xl: 0, pill: 0 },
+  soft: { sm: 4, md: 8, lg: 14, xl: 20, pill: 999 },
+  rounded: { sm: 8, md: 14, lg: 24, xl: 32, pill: 999 },
+  pill: { sm: 12, md: 20, lg: 32, xl: 44, pill: 999 },
+};
+
+/**
+ * Build a Theme from a `<theme …/>` tag's attributes, over a base theme.
+ * Only valid-looking values land; everything else keeps the base token. This
+ * is what makes freeform pages look *different per prompt* — without it every
+ * generation wears the default palette and gradients.
+ */
+export function parseDialectTheme(text: string, base: ThemeLike): ThemeLike {
+  const m = text.match(/<theme((?:\s+[^<>]*?)?)\/?>/i);
+  const t = base.tokens as unknown as ThemeTokens;
+  if (!m) return base;
+  const a = parseAttrs(m[1] ?? "");
+  const color = (key: string, cur: string) => (isColorish(a[key]) ? String(a[key]) : cur);
+  const grad = (key: string, cur: string) => (isGradientish(a[key]) ? String(a[key]) : cur);
+  const font = (key: string, cur: string) => (typeof a[key] === "string" && String(a[key]).length > 2 ? String(a[key]) : cur);
+  const tokens: ThemeTokens = {
+    ...t,
+    colors: {
+      bg: color("bg", t.colors.bg),
+      surface: color("surface", t.colors.surface),
+      text: color("text", t.colors.text),
+      muted: color("muted", t.colors.muted),
+      primary: color("primary", t.colors.primary),
+      primaryText: color("primaryText", t.colors.primaryText),
+      border: color("border", t.colors.border),
+    },
+    fonts: {
+      body: font("bodyFont", t.fonts.body),
+      heading: font("headingFont", t.fonts.heading),
+    },
+    gradients: {
+      hero: grad("gradientHero", t.gradients.hero),
+      accent: grad("gradientAccent", t.gradients.accent),
+      subtle: grad("gradientSubtle", t.gradients.subtle),
+    },
+    radii: RADIUS_PRESETS[String(a.radius ?? "")] ?? t.radii,
+  };
+  return { id: "generated", tokens };
+}
+
 /** Derive the dialect vocabulary from the registry — custom elements join free. */
 export function buildDialectVocabulary(registry: Registry): string {
   return registry
@@ -160,8 +211,25 @@ export function buildDialectSystemPrompt(registry: Registry): string {
     `every tag is a builder Element and every attribute is one of its props.\n\n` +
     `Vocabulary (ONLY these tags; ONLY these attributes; kebab-case attributes ` +
     `map to camelCase props):\n${buildDialectVocabulary(registry)}\n\n` +
+    `Theme: your page gets its OWN visual identity. Start the output with ONE ` +
+    `self-closing <theme /> tag that art-directs the whole page:\n` +
+    `  <theme primary="#b45309" primary-text="#ffffff" bg="#fffbf5" surface="#fdf3e3" ` +
+    `text="#2d1f14" muted="#8a7461" border="#eedfca" ` +
+    `heading-font="Georgia, 'Times New Roman', serif" body-font="Arial, Helvetica, sans-serif" ` +
+    `gradient-hero="linear-gradient(160deg,#fdf3e3 0%,#fffbf5 70%)" ` +
+    `gradient-accent="linear-gradient(135deg,#b45309 0%,#dc2626 100%)" ` +
+    `gradient-subtle="linear-gradient(180deg,#fffbf5 0%,#fdf3e3 100%)" radius="soft" />\n` +
+    `Theme rules:\n` +
+    `- DERIVE the palette from the subject — a heart-health brand is not the same ` +
+    `colors as a dev tool or a law firm. NEVER reuse the example values above and ` +
+    `NEVER default to indigo/purple.\n` +
+    `- Gradients must be built from YOUR palette's colors.\n` +
+    `- Fonts: email-safe stacks (Georgia/Times serif, Arial/Helvetica/Verdana/` +
+    `'Trebuchet MS' sans, Inter/system-ui for modern). Pair heading vs body deliberately.\n` +
+    `- radius: one of "sharp" | "soft" | "rounded" | "pill" — match the brand's tone.\n` +
+    `- Ensure text/bg and primaryText/primary have strong contrast.\n\n` +
     `Rules:\n` +
-    `- Top level: a sequence of <section> elements. No <html>, <head>, <body>, <div>, <style>, classes or inline CSS.\n` +
+    `- After <theme />: a sequence of <section> elements. No <html>, <head>, <body>, <div>, <style>, classes or inline CSS.\n` +
     `- Prop values use Theme tokens and scale steps exactly as hinted (e.g. ` +
     `background="gradient:hero", padding="7", size="3xl") — NEVER raw CSS.\n` +
     `- Inside text elements only inline formatting is kept: b, i, a, em, strong, br, span.\n` +
@@ -175,12 +243,16 @@ export function buildDialectSystemPrompt(registry: Registry): string {
   );
 }
 
-/** Generate a page in the HTML dialect and return a validated Document. */
+/**
+ * Generate a page in the HTML dialect. Returns the validated Document AND the
+ * model-authored Theme (falls back to the input theme when no <theme /> tag
+ * survives validation) — apply both, or every generation shares one skin.
+ */
 export async function generatePageHtml(
   provider: Provider,
   input: GeneratePageHtmlInput,
   onActivity?: OnActivity,
-): Promise<Document> {
+): Promise<{ doc: Document; theme: ThemeLike }> {
   const system =
     buildDialectSystemPrompt(input.registry) +
     (input.skills?.length ? `\n\nGuidance:\n${input.skills.join("\n")}` : "");
@@ -189,5 +261,7 @@ export async function generatePageHtml(
     ? await provider.generateStream(req, onActivity)
     : await provider.generate(req);
   onActivity?.({ type: "status", message: "Parsing & validating markup…" });
-  return parseElementHtml(out, input.registry, input.theme);
+  const theme = parseDialectTheme(extractDialect(out), input.theme);
+  const doc = parseElementHtml(out, input.registry, theme);
+  return { doc, theme };
 }
