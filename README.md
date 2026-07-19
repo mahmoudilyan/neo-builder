@@ -69,6 +69,47 @@ Each has a drag-drop canvas, inline editing, responsive breakpoints, theme editi
 an AI agent panel (works with a mock provider — no key needed; add an Anthropic key for
 live generation).
 
+## Use it from Claude (MCP)
+
+The playground is operable by any MCP host — Claude Code, Cursor, Codex — over the
+stdio server in `@neo-builder/mcp`, which bridges to the running playground tab via
+WebSocket.
+
+1. **Build and start the playground:**
+
+   ```sh
+   pnpm install && pnpm build
+   pnpm --filter @neo-builder/playground dev   # open http://localhost:5173
+   ```
+
+2. **Register the server.** This repo ships a [`.mcp.json`](./.mcp.json), so Claude Code
+   picks it up automatically when started from the repo root. Anywhere else:
+
+   ```sh
+   claude mcp add neo-builder -- node <repo>/packages/mcp/dist/server.js
+   ```
+
+3. **Check the bridge.** The playground topbar shows an `● MCP` badge — green means a
+   host is connected to the tab. Then just prompt, e.g.:
+
+   > Design a landing page for an AI analytics tool: bold hero on a gradient, one sharp
+   > stat, three feature cards, one strong CTA.
+
+The server exposes six tools:
+
+| Tool | Purpose |
+| --- | --- |
+| `get_document` | Outline of every element (id: type), active theme tokens, builder type |
+| `list_element_types` | Element types with prop contracts, usage hints, and commands |
+| `set_page` | Replace the whole page from element-HTML dialect (best from-scratch tool); optional leading `<theme …/>` tag |
+| `apply_plan` | Batch command steps (`insert`/`update`/`move`/`remove`, `"$K"` refs) as one undo step |
+| `set_theme` | Merge partial theme tokens (colors, fonts, radii, gradients) |
+| `screenshot` | Compile the current document and screenshot it in the browser |
+
+Typical agent loop: `get_document` → `set_page` → `apply_plan` for edits →
+`screenshot` to self-check. Every batch lands as a single undo step, attributed to the
+agent, in the same history the human sees.
+
 ## Quick start (headless)
 
 ```ts

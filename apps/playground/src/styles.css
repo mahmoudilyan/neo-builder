@@ -148,7 +148,26 @@ body { font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
 .mx-palette-item:hover { border-color: #6366f1; }
 .mx-pi-icon { font-size: 15px; }
 .mx-pi-label { font-size: 11px; color: #8b93a4; }
-.mx-inspector { display: flex; flex-direction: column; gap: 10px; }
+.mx-inspector { display: flex; flex-direction: column; gap: 12px; }
+.mx-group { display: flex; flex-direction: column; gap: 8px; background: #12151d; border: 1px solid #232936; border-radius: 10px; padding: 10px; }
+.mx-group-head { display: flex; align-items: center; gap: 8px; }
+.mx-group-title { flex-shrink: 0; }
+.mx-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 28px; }
+.mx-row-label { flex: 0 0 34%; font-size: 12px; color: #8b93a4; }
+.mx-row-ctl { flex: 1; display: flex; justify-content: flex-end; min-width: 0; }
+.mx-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
+.mx-chips { display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; }
+.mx-chip { font: inherit; font-size: 11px; cursor: pointer; padding: 3px 8px; border-radius: 999px; border: 1px solid #2e3648; background: #171b26; color: #cdd2da; transition: border-color .12s ease; }
+.mx-chip:hover { border-color: #6366f1; }
+.mx-chip.is-on { border-color: #6366f1; background: #1d2340; color: #c7d2fe; }
+.mx-colorctl { display: flex; align-items: center; gap: 4px; }
+.mx-color-chip { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; position: relative; font-size: 11px; color: #cdd2da; padding: 3px 8px; border-radius: 999px; border: 1px solid #2e3648; background: #171b26; }
+.mx-color-chip.is-empty { border-style: dashed; color: #8b93a4; }
+.mx-color-chip input[type=color] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.mx-color-dot { width: 12px; height: 12px; border-radius: 4px; border: 1px solid #2e3648; }
+.mx-adv { display: flex; flex-direction: column; gap: 7px; border-top: 1px solid #232936; padding-top: 10px; }
+.mx-adv summary { cursor: pointer; list-style: none; }
+.mx-adv summary::-webkit-details-marker { display: none; }
 .mx-el-head { display: flex; gap: 10px; align-items: center; }
 .mx-el-icon { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: #6366f1; color: #fff; border-radius: 8px; font-size: 16px; }
 .mx-el-meta { display: flex; align-items: center; gap: 6px; }
